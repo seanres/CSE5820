@@ -22,6 +22,7 @@ def main():
     parser.add_argument('--seed', type=int, default=42, help='For reproducibility')
     parser.add_argument('--exploration_rate', type=float, default=1.0, help='How much will gambler explore')
     parser.add_argument('--save_tag', type=str, default='', help='Additional tag to title for renaming')
+    parser.add_argument('--step_max', type=int, default=250, help='How often to record Q-table values')
     
 
     ARGS, unparsed = parser.parse_known_args()
@@ -37,11 +38,6 @@ def main():
         agent = GamblerHW(learning_rate=ARGS.learning_rate, discount=ARGS.discount, exploration_rate=ARGS.exploration_rate, iterations=ARGS.iterations)
     else:
         agent = Drunkard()
-
-    if ARGS.agent == 'GAMBLER_HW':
-        step_max = 5
-    else:
-        step_max = 250
 
     # setup simulation
     dungeon = DungeonSimulator()
@@ -59,7 +55,7 @@ def main():
         agent.update(old_state, new_state, action, reward) # Let the agent update internals
 
         total_reward += reward # Keep score
-        if step % step_max == 0: # Print out metadata every 250th iteration
+        if step % ARGS.step_max == 0: # Print out metadata every 250th iteration
             performance = (total_reward - last_total) / 250.0
             print(json.dumps({'step': step, 'performance': performance, 'total_reward': total_reward}))
             last_total = total_reward
